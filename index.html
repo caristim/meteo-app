@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estación Meteorológica</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="contenedor">
+
+    <h1>🌦 Estación Meteorológica</h1>
+
+    <div class="tarjeta">
+      <h2>Ingresar medición</h2>
+
+      <input type="number" id="temperatura" placeholder="Temperatura °C">
+
+      <input type="number" id="humedad" placeholder="Humedad %">
+
+      <input type="number" id="viento" placeholder="Viento km/h">
+
+      <input type="number" id="presion" placeholder="Presión hPa">
+
+      <input type="number" id="lluvia" placeholder="Lluvia mm">
+
+      <button onclick="guardarDatos()">
+        Guardar medición
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Última medición</h2>
+
+      <div id="datosActuales">
+        Sin datos.
+      </div>
+    </div>
+
+    <div class="tarjeta prediccion">
+      <h2>Pronóstico próximas 12 horas</h2>
+
+      <div id="prediccion">
+        Sin predicción.
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Gráfica meteorológica</h2>
+
+      <canvas id="grafica"></canvas>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
