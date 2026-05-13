@@ -39,34 +39,21 @@ function guardarDatos() {
 
   mostrarDatos();
   generarGrafica();
+  mostrarHistorial();
+
+  limpiarCampos();
+}
+
+function limpiarCampos() {
+
+  document.getElementById("temperatura").value = "";
+  document.getElementById("humedad").value = "";
+  document.getElementById("viento").value = "";
+  document.getElementById("presion").value = "";
+  document.getElementById("lluvia").value = "";
 }
 
 function mostrarDatos() {
 
   const historial = JSON.parse(localStorage.getItem("historialMeteorologico")) || [];
-
-  if (historial.length === 0) {
-    return;
-  }
-
-  const datos = historial[historial.length - 1];
-
-  document.getElementById("datosActuales").innerHTML = `
-    <strong>Fecha:</strong> ${datos.fecha}<br>
-    <strong>Temperatura:</strong> ${datos.temperatura} °C<br>
-    <strong>Humedad:</strong> ${datos.humedad}%<br>
-    <strong>Viento:</strong> ${datos.viento} km/h<br>
-    <strong>Presión:</strong> ${datos.presion} hPa<br>
-    <strong>Lluvia:</strong> ${datos.lluvia} mm
-  `;
-
-  generarPronostico(datos);
-}
-
-function generarPronostico(datos) {
-
-  let estado = "Estable";
-  let icono = "⛅";
-
-  if (datos.presion < 1005 && datos.humedad > 80) {
-generarGrafica();
+mostrarHistorial();
