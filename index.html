@@ -1,4 +1,86 @@
 <!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Estación Meteorológica</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+  <div class="contenedor">
+
+    <header class="encabezado">
+
+      <h1>🌦 Estación Meteorológica</h1>
+
+      <p>
+        Pronóstico meteorológico local • Próximas 12 horas
+      </p>
+
+    </header>
+
+    <div class="tarjeta formulario">
+
+      <h2>📥 Nueva medición</h2>
+
+      <input
+        type="number"
+        id="temperatura"
+        placeholder="Temperatura °C"
+      >
+
+      <input
+        type="number"
+        id="humedad"
+        placeholder="Humedad %"
+      >
+
+      <input
+        type="number"
+        id="viento"
+        placeholder="Velocidad del viento m/s"
+      >
+
+      <select id="direccionViento">
+
+        <option value="N">Norte (N)</option>
+        <option value="NE">Noreste (NE)</option>
+        <option value="E">Este (E)</option>
+        <option value="SE">Sudeste (SE)</option>
+        <option value="S">Sur (S)</option>
+        <option value="SW">Sudoeste (SW)</option>
+        <option value="W">Oeste (W)</option>
+        <option value="NW">Noroeste (NW)</option>
+
+      </select>
+
+      <input
+        type="number"
+        id="presion"
+        placeholder="Presión hPa"
+      >
+
+      <input
+        type="number"
+        id="lluvia"
+        placeholder="Lluvia mm"
+      >
+
+      <button onclick="guardarDatos()">
+        Guardar medición
+      </button>
+
+    </div>
 
     <div class="grid">
 
@@ -12,7 +94,7 @@
 
       </div>
 
-      <div class="tarjeta prediccion">
+      <div class="tarjeta pronostico">
 
         <h2>🛰 Pronóstico 12 horas</h2>
 
@@ -34,7 +116,7 @@
 
     <div class="tarjeta">
 
-      <h2>🗂 Historial de mediciones</h2>
+      <h2>🗂 Historial meteorológico</h2>
 
       <button onclick="exportarCSV()">
         Exportar CSV
@@ -49,4 +131,5 @@
   <script src="script.js"></script>
 
 </body>
+
 </html>
