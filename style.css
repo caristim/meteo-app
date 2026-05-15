@@ -1,60 +1,181 @@
 body {
+
   margin: 0;
   padding: 0;
+
   font-family: Arial, sans-serif;
-  background: linear-gradient(to bottom, #0d1b2a, #1b263b);
+
+  background:
+    linear-gradient(
+      to bottom,
+      #0d1b2a,
+      #1b263b
+    );
+
   color: white;
 }
 
 .contenedor {
+
   max-width: 1100px;
+
   margin: auto;
+
   padding: 20px;
 }
 
 .encabezado {
+
   text-align: center;
+
   margin-bottom: 25px;
 }
 
 .encabezado h1 {
+
   margin: 0;
+
   font-size: 38px;
 }
 
 .encabezado p {
+
   color: #cbd5e1;
+
   margin-top: 10px;
 }
 
 .grid {
+
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: 20px;
 }
 
 .tarjeta {
-  background: rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.08);
+
   backdrop-filter: blur(8px);
-  border-radius: 16px;
+
+  border-radius: 18px;
+
   padding: 20px;
+
   margin-top: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+
+  box-shadow:
+    0 4px 20px rgba(0,0,0,0.35);
 }
 
-.prediccion {
-  border: 2px solid #38bdf8;
+.pronostico {
+
+  border:
+    2px solid #38bdf8;
 }
 
 h2 {
+
   margin-top: 0;
+
   color: #90e0ef;
 }
 
 input,
 select {
+
   width: 100%;
+
   box-sizing: border-box;
+
   margin-top: 12px;
+
   padding: 14px;
+
+  border-radius: 10px;
+
+  border: none;
+
+  font-size: 16px;
+
+  background:
+    rgba(255,255,255,0.92);
+}
+
+button {
+
+  width: 100%;
+
+  margin-top: 18px;
+
+  padding: 15px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #00b4d8;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+button:hover {
+
+  background: #0096c7;
+}
+
+#datosActuales,
+#prediccion {
+
+  line-height: 1.8;
+
+  font-size: 17px;
+}
+
+.registro {
+
+  margin-top: 15px;
+
+  padding: 14px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  line-height: 1.7;
+}
+
+canvas {
+
+  margin-top: 20px;
+
+  background: white;
+
+  border-radius: 12px;
+
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+
+  .grid {
+
+    grid-template-columns: 1fr;
+  }
+
+  .encabezado h1 {
+
+    font-size: 30px;
+  }
+
 }
