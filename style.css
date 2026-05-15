@@ -1,111 +1,60 @@
 body {
   margin: 0;
-  padding: 20px;
+  padding: 0;
   font-family: Arial, sans-serif;
-  background: #e8f2f9;
+  background: linear-gradient(to bottom, #0d1b2a, #1b263b);
+  color: white;
 }
 
 .contenedor {
-  max-width: 900px;
+  max-width: 1100px;
   margin: auto;
+  padding: 20px;
 }
 
-h1 {
+.encabezado {
   text-align: center;
-  color: #0d3b66;
   margin-bottom: 25px;
 }
 
+.encabezado h1 {
+  margin: 0;
+  font-size: 38px;
+}
+
+.encabezado p {
+  color: #cbd5e1;
+  margin-top: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
 .tarjeta {
-  background: white;
-  margin-top: 20px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-top: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .prediccion {
-  background: #dff6dd;
-}
-
-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 15px;
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #125aa0;
-}
-
-#datosActuales,
-#prediccion {
-  font-size: 18px;
-  line-height: 1.7;
-}
-
-canvas {
-  margin-top: 20px;
-  width: 100% !important;
-  max-height: 450px;
-}
-
-.registro {
-  margin-top: 15px;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f4f8fb;
-  line-height: 1.6;
-  font-size: 16px;
+  border: 2px solid #38bdf8;
 }
 
 h2 {
-  color: #124265;
+  margin-top: 0;
+  color: #90e0ef;
 }
 
-@media (max-width: 600px) {
-
-  body {
-    padding: 10px;
-  }
-
-  .tarjeta {
-    padding: 15px;
-  }
-
-  h1 {
-    font-size: 28px;
-  }
-
-  h2 {
-    font-size: 22px;
-  }
-
-  input,
-  button {
-    font-size: 16px;
-  }
-
-  #datosActuales,
-  #prediccion,
-  .registro {
-    font-size: 16px;
-  }
-
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding: 14px;
 }
