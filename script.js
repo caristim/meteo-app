@@ -1,5 +1,37 @@
 let grafica;
 
+function obtenerFaseLunar() {
+
+  const hoy = new Date();
+
+  const lp = 2551443;
+
+  const nuevaLuna =
+    new Date(1970, 0, 7, 20, 35, 0);
+
+  const fase =
+    ((hoy.getTime() - nuevaLuna.getTime()) / 1000) % lp;
+
+  const dias =
+    Math.floor(fase / (24 * 3600));
+
+  if (dias < 2) return "🌑 Luna Nueva";
+
+  if (dias < 7) return "🌒 Luna Creciente";
+
+  if (dias < 10) return "🌓 Cuarto Creciente";
+
+  if (dias < 15) return "🌔 Gibosa Creciente";
+
+  if (dias < 18) return "🌕 Luna Llena";
+
+  if (dias < 22) return "🌖 Gibosa Menguante";
+
+  if (dias < 25) return "🌗 Cuarto Menguante";
+
+  return "🌘 Luna Menguante";
+}
+
 function guardarDatos() {
 
   const temperatura =
@@ -46,10 +78,24 @@ function guardarDatos() {
   const vientoKMH =
     (vientoMS * 3.6).toFixed(1);
 
+  const ahora = new Date();
+
+  const fecha =
+    ahora.toLocaleDateString();
+
+  const hora =
+    ahora.toLocaleTimeString();
+
+  const faseLunar =
+    obtenerFaseLunar();
+
   const nuevaMedicion = {
 
-    fecha:
-      new Date().toLocaleString(),
+    fecha,
+
+    hora,
+
+    faseLunar,
 
     temperatura,
 
@@ -123,26 +169,31 @@ function mostrarDatos() {
     "datosActuales"
   ).innerHTML = `
 
-    <strong>Fecha:</strong>
+    📅 <strong>Fecha:</strong>
     ${datos.fecha}<br>
 
-    🌡 Temperatura:
+    🕒 <strong>Hora:</strong>
+    ${datos.hora}<br>
+
+    🌙 <strong>Fase lunar:</strong>
+    ${datos.faseLunar}<br><br>
+
+    🌡 <strong>Temperatura:</strong>
     ${datos.temperatura} °C<br>
 
-    💧 Humedad:
+    💧 <strong>Humedad:</strong>
     ${datos.humedad}%<br>
 
-    💨 Viento:
-    ${datos.vientoMS} m/s
-    (${datos.vientoKMH} km/h)<br>
+    💨 <strong>Viento:</strong>
+    ${datos.vientoKMH} km/h<br>
 
-    🧭 Dirección:
+    🧭 <strong>Dirección:</strong>
     ${datos.direccionViento}<br>
 
-    📉 Presión:
+    📉 <strong>Presión:</strong>
     ${datos.presion} hPa<br>
 
-    🌧 Lluvia:
+    🌧 <strong>Lluvia:</strong>
     ${datos.lluvia} mm
   `;
 
@@ -159,7 +210,7 @@ function generarPronostico(historial) {
   let mensaje =
     "Tiempo relativamente estable.";
 
-  let frente = "";
+  let detalle = "";
 
   if (
     datos.presion < 1005 &&
@@ -169,10 +220,10 @@ function generarPronostico(historial) {
     icono = "🌧";
 
     mensaje =
-      "Alta probabilidad de lluvias o tormentas.";
+      "Alta probabilidad de lluvias.";
 
-    frente =
-      "Se detecta inestabilidad atmosférica.";
+    detalle =
+      "La presión atmosférica es baja y la humedad elevada.";
   }
 
   if (
@@ -185,7 +236,7 @@ function generarPronostico(historial) {
     mensaje =
       "Ingreso probable de aire frío.";
 
-    frente =
+    detalle =
       "Posible frente frío desde el sur.";
   }
 
@@ -197,9 +248,9 @@ function generarPronostico(historial) {
     icono = "🌦";
 
     mensaje =
-      "Ingreso de aire húmedo e inestable.";
+      "Ingreso de aire húmedo.";
 
-    frente =
+    detalle =
       "Probables lluvias aisladas.";
   }
 
@@ -213,7 +264,7 @@ function generarPronostico(historial) {
     mensaje =
       "Ambiente muy húmedo.";
 
-    frente =
+    detalle =
       "Posible niebla o llovizna.";
   }
 
@@ -225,9 +276,9 @@ function generarPronostico(historial) {
     icono = "☀️";
 
     mensaje =
-      "Condiciones estables y secas.";
+      "Condiciones estables.";
 
-    frente =
+    detalle =
       "Buen tiempo esperado.";
   }
 
@@ -238,9 +289,9 @@ function generarPronostico(historial) {
     icono = "💨";
 
     mensaje =
-      "Vientos fuertes en aumento.";
+      "Vientos fuertes.";
 
-    frente =
+    detalle =
       "Posible cambio de masa de aire.";
   }
 
@@ -258,29 +309,26 @@ function generarPronostico(historial) {
     </p>
 
     <p>
-      ${frente}
+      ${detalle}
     </p>
 
     <hr>
 
-    <strong>
-      Próximas 12 horas:
-    </strong><br><br>
+    📅 ${datos.fecha}<br>
 
-    🌡 Temperatura:
-    ${datos.temperatura} °C<br>
+    🕒 ${datos.hora}<br>
 
-    💨 Viento:
-    ${datos.vientoKMH} km/h<br>
+    🌙 ${datos.faseLunar}<br><br>
 
-    🧭 Dirección:
-    ${datos.direccionViento}<br>
+    🌡 ${datos.temperatura} °C<br>
 
-    💧 Humedad:
-    ${datos.humedad}%<br>
+    💨 ${datos.vientoKMH} km/h<br>
 
-    📉 Presión:
-    ${datos.presion} hPa
+    🧭 ${datos.direccionViento}<br>
+
+    💧 ${datos.humedad}%<br>
+
+    📉 ${datos.presion} hPa
   `;
 }
 
@@ -294,22 +342,34 @@ function generarGrafica() {
     ) || [];
 
   const etiquetas =
-    historial.map(item => item.fecha);
+    historial.map(
+      item => item.hora
+    );
 
   const temperaturas =
-    historial.map(item => item.temperatura);
+    historial.map(
+      item => item.temperatura
+    );
 
   const humedades =
-    historial.map(item => item.humedad);
+    historial.map(
+      item => item.humedad
+    );
 
   const vientos =
-    historial.map(item => item.vientoKMH);
+    historial.map(
+      item => item.vientoKMH
+    );
 
   const presiones =
-    historial.map(item => item.presion);
+    historial.map(
+      item => item.presion
+    );
 
   const lluvias =
-    historial.map(item => item.lluvia);
+    historial.map(
+      item => item.lluvia
+    );
 
   const ctx =
     document
@@ -406,9 +466,11 @@ function mostrarHistorial() {
 
         <div class="registro">
 
-          <strong>
-            ${item.fecha}
-          </strong><br>
+          📅 ${item.fecha} |
+
+          🕒 ${item.hora}<br>
+
+          🌙 ${item.faseLunar}<br><br>
 
           🌡 ${item.temperatura} °C |
 
@@ -450,12 +512,12 @@ function exportarCSV() {
   }
 
   let csv =
-    "Fecha,Temperatura,Humedad,VientoKMH,Direccion,Presion,Lluvia\n";
+    "Fecha,Hora,FaseLunar,Temperatura,Humedad,VientoKMH,Direccion,Presion,Lluvia\n";
 
   historial.forEach(item => {
 
     csv +=
-      `${item.fecha},${item.temperatura},${item.humedad},${item.vientoKMH},${item.direccionViento},${item.presion},${item.lluvia}\n`;
+      `${item.fecha},${item.hora},${item.faseLunar},${item.temperatura},${item.humedad},${item.vientoKMH},${item.direccionViento},${item.presion},${item.lluvia}\n`;
   });
 
   const blob =
