@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Estación Meteorológica</title>
+  <title>Estación Meteorológica Inteligente</title>
 
   <link rel="stylesheet" href="style.css">
 
@@ -21,10 +21,10 @@
 
     <header class="encabezado">
 
-      <h1>🌦 Estación Meteorológica</h1>
+      <h1>🌦 Estación Meteorológica Inteligente</h1>
 
       <p>
-        Pronóstico meteorológico local • Próximas 12 horas
+        Microclima local • Pronóstico inteligente • Radar meteorológico
       </p>
 
     </header>
@@ -48,7 +48,7 @@
       <input
         type="number"
         id="viento"
-        placeholder="Velocidad del viento (ingresar en m/s)"
+        placeholder="Velocidad del viento (m/s)"
       >
 
       <label class="etiqueta">
@@ -57,37 +57,14 @@
 
       <select id="direccionViento">
 
-        <option value="N">
-          Norte (N)
-        </option>
-
-        <option value="NE">
-          Noreste (NE)
-        </option>
-
-        <option value="E">
-          Este (E)
-        </option>
-
-        <option value="SE">
-          Sudeste (SE)
-        </option>
-
-        <option value="S">
-          Sur (S)
-        </option>
-
-        <option value="SW">
-          Sudoeste (SW)
-        </option>
-
-        <option value="W">
-          Oeste (W)
-        </option>
-
-        <option value="NW">
-          Noroeste (NW)
-        </option>
+        <option value="N">Norte (N)</option>
+        <option value="NE">Noreste (NE)</option>
+        <option value="E">Este (E)</option>
+        <option value="SE">Sudeste (SE)</option>
+        <option value="S">Sur (S)</option>
+        <option value="SW">Sudoeste (SW)</option>
+        <option value="W">Oeste (W)</option>
+        <option value="NW">Noroeste (NW)</option>
 
       </select>
 
@@ -123,7 +100,7 @@
 
       <div class="tarjeta pronostico">
 
-        <h2>🛰 Pronóstico 12 horas</h2>
+        <h2>🤖 Asistente meteorológico</h2>
 
         <div id="prediccion">
           Sin pronóstico.
@@ -138,6 +115,19 @@
       <h2>📈 Evolución meteorológica</h2>
 
       <canvas id="grafica"></canvas>
+
+    </div>
+
+    <div class="tarjeta">
+
+      <h2>🛰 Radar y mapa meteorológico</h2>
+
+      <iframe
+        src="https://embed.windy.com/embed2.html?lat=-33.74&lon=-53.37&detailLat=-33.74&detailLon=-53.37&width=650&height=450&zoom=7&level=surface&overlay=rain&product=ecmwf"
+        width="100%"
+        height="450"
+        frameborder="0">
+      </iframe>
 
     </div>
 
