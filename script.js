@@ -103,13 +103,15 @@ function guardarDatos() {
 
     vientoMS,
 
-    vientoKMH,
+    vientoKMH: parseFloat(vientoKMH),
 
     direccionViento,
 
     presion,
 
-    lluvia
+    lluvia,
+
+    timestamp: Date.now()
   };
 
   let historial =
@@ -148,6 +150,308 @@ function limpiarCampos() {
   document.getElementById("lluvia").value = "";
 }
 
+function calcularTendencias(historial) {
+
+  if (historial.length < 3) {
+
+    return {
+      tendenciaPresion: "estable",
+      tendenciaTemp: "estable",
+      tendenciaHumedad: "estable"
+    };
+  }
+
+  const actual =
+    historial[historial.length - 1];
+
+  const anterior =
+    historial[historial.length - 3];
+
+  const deltaPresion =
+    actual.presion - anterior.presion;
+
+  const deltaTemp =
+    actual.temperatura - anterior.temperatura;
+
+  const deltaHumedad =
+    actual.humedad - anterior.humedad;
+
+  let tendenciaPresion = "estable";
+
+  let tendenciaTemp = "estable";
+
+  let tendenciaHumedad = "estable";
+
+  if (deltaPresion <= -4)
+    tendenciaPresion = "bajando fuerte";
+
+  else if (deltaPresion < 0)
+    tendenciaPresion = "bajando";
+
+  else if (deltaPresion >= 4)
+    tendenciaPresion = "subiendo fuerte";
+
+  else if (deltaPresion > 0)
+    tendenciaPresion = "subiendo";
+
+  if (deltaTemp > 2)
+    tendenciaTemp = "subiendo";
+
+  else if (deltaTemp < -2)
+    tendenciaTemp = "bajando";
+
+  if (deltaHumedad > 10)
+    tendenciaHumedad = "subiendo";
+
+  else if (deltaHumedad < -10)
+    tendenciaHumedad = "bajando";
+
+  return {
+    tendenciaPresion,
+    tendenciaTemp,
+    tendenciaHumedad
+  };
+}
+
+function generarAlertas(datos, tendencias) {
+
+  let alertas = [];
+
+  if (
+    datos.presion < 1005 &&
+    datos.humedad > 85 &&
+    tendencias.tendenciaPresion.includes("bajando")
+  ) {
+
+    alertas.push(
+      "🔴 Alerta de lluvia o tormenta"
+    );
+  }
+
+  if (
+    datos.vientoKMH > 50
+  ) {
+
+    alertas.push(
+      "💨 Alerta de viento fuerte"
+    );
+  }
+
+  if (
+    datos.temperatura > 34
+  ) {
+
+    alertas.push(
+      "🌡 Alerta por calor intenso"
+    );
+  }
+
+  if (
+    datos.temperatura < 5
+  ) {
+
+    alertas.push(
+      "❄ Riesgo de frío intenso"
+    );
+  }
+
+  return alertas;
+}
+
+function clasificarTiempo(datos, tendencias) {
+
+  if (
+    datos.presion > 1015 &&
+    datos.humedad < 70
+  ) {
+
+    return "☀️ Estable y seco";
+  }
+
+  if (
+    datos.presion < 1005 &&
+    datos.humedad > 85
+  ) {
+
+    return "🌧 Inestable y húmedo";
+  }
+
+  if (
+    datos.direccionViento === "S" &&
+    tendencias.tendenciaTemp === "bajando"
+  ) {
+
+    return "🌬 Frente frío probable";
+  }
+
+  if (
+    datos.direccionViento === "NE" &&
+    datos.humedad > 80
+  ) {
+
+    return "🌦 Aire húmedo e inestable";
+  }
+
+  if (
+    datos.humedad > 92 &&
+    datos.vientoKMH < 10
+  ) {
+
+    return "🌫 Posible niebla";
+  }
+
+  return "⛅ Tiempo relativamente estable";
+}
+
+function generarPronostico(historial) {
+
+  const datos =
+    historial[historial.length - 1];
+
+  const tendencias =
+    calcularTendencias(historial);
+
+  const clasificacion =
+    clasificarTiempo(
+      datos,
+      tendencias
+    );
+
+  const alertas =
+    generarAlertas(
+      datos,
+      tendencias
+    );
+
+  let pronostico12h =
+    "Sin cambios importantes.";
+
+  let pronostico24h =
+    "Condiciones relativamente estables.";
+
+  if (
+    tendencias.tendenciaPresion.includes("bajando")
+  ) {
+
+    pronostico12h =
+      "Aumento de inestabilidad.";
+
+    pronostico24h =
+      "Probabilidad creciente de precipitaciones.";
+  }
+
+  if (
+    tendencias.tendenciaPresion.includes("subiendo")
+  ) {
+
+    pronostico12h =
+      "Mejoría gradual del tiempo.";
+
+    pronostico24h =
+      "Condiciones más estables y secas.";
+  }
+
+  if (
+    datos.direccionViento === "S"
+  ) {
+
+    pronostico12h +=
+      " Ingreso de aire más frío.";
+
+    pronostico24h +=
+      " Descenso térmico probable.";
+  }
+
+  if (
+    datos.direccionViento === "NE"
+  ) {
+
+    pronostico12h +=
+      " Ambiente húmedo.";
+
+    pronostico24h +=
+      " Posibles lluvias aisladas.";
+  }
+
+  let htmlAlertas = "";
+
+  if (alertas.length > 0) {
+
+    htmlAlertas =
+      `
+      <div class="alertas">
+
+        <h3>⚠ Alertas meteorológicas</h3>
+
+        ${alertas.map(
+          a => `<p>${a}</p>`
+        ).join("")}
+
+      </div>
+      `;
+  }
+
+  document.getElementById(
+    "prediccion"
+  ).innerHTML = `
+
+    ${htmlAlertas}
+
+    <h3>
+      🤖 Asistente meteorológico local
+    </h3>
+
+    <p>
+
+      <strong>
+        Clasificación automática:
+      </strong><br>
+
+      ${clasificacion}
+
+    </p>
+
+    <hr>
+
+    <strong>
+      Pronóstico 12 horas
+    </strong>
+
+    <p>
+      ${pronostico12h}
+    </p>
+
+    <strong>
+      Pronóstico 24 horas
+    </strong>
+
+    <p>
+      ${pronostico24h}
+    </p>
+
+    <hr>
+
+    <strong>
+      Tendencias atmosféricas
+    </strong><br><br>
+
+    📉 Presión:
+    ${tendencias.tendenciaPresion}<br>
+
+    🌡 Temperatura:
+    ${tendencias.tendenciaTemp}<br>
+
+    💧 Humedad:
+    ${tendencias.tendenciaHumedad}<br><br>
+
+    🌙 ${datos.faseLunar}<br>
+
+    💨 ${datos.vientoKMH} km/h<br>
+
+    🧭 ${datos.direccionViento}
+  `;
+}
+
 function mostrarDatos() {
 
   const historial =
@@ -157,10 +461,8 @@ function mostrarDatos() {
       )
     ) || [];
 
-  if (historial.length === 0) {
-
+  if (historial.length === 0)
     return;
-  }
 
   const datos =
     historial[historial.length - 1];
@@ -168,151 +470,6 @@ function mostrarDatos() {
   document.getElementById(
     "datosActuales"
   ).innerHTML = `
-
-    📅 <strong>Fecha:</strong>
-    ${datos.fecha}<br>
-
-    🕒 <strong>Hora:</strong>
-    ${datos.hora}<br>
-
-    🌙 <strong>Fase lunar:</strong>
-    ${datos.faseLunar}<br><br>
-
-    🌡 <strong>Temperatura:</strong>
-    ${datos.temperatura} °C<br>
-
-    💧 <strong>Humedad:</strong>
-    ${datos.humedad}%<br>
-
-    💨 <strong>Viento:</strong>
-    ${datos.vientoKMH} km/h<br>
-
-    🧭 <strong>Dirección:</strong>
-    ${datos.direccionViento}<br>
-
-    📉 <strong>Presión:</strong>
-    ${datos.presion} hPa<br>
-
-    🌧 <strong>Lluvia:</strong>
-    ${datos.lluvia} mm
-  `;
-
-  generarPronostico(historial);
-}
-
-function generarPronostico(historial) {
-
-  const datos =
-    historial[historial.length - 1];
-
-  let icono = "⛅";
-
-  let mensaje =
-    "Tiempo relativamente estable.";
-
-  let detalle = "";
-
-  if (
-    datos.presion < 1005 &&
-    datos.humedad > 85
-  ) {
-
-    icono = "🌧";
-
-    mensaje =
-      "Alta probabilidad de lluvias.";
-
-    detalle =
-      "La presión atmosférica es baja y la humedad elevada.";
-  }
-
-  if (
-    datos.direccionViento === "S" &&
-    datos.temperatura < 15
-  ) {
-
-    icono = "🌬";
-
-    mensaje =
-      "Ingreso probable de aire frío.";
-
-    detalle =
-      "Posible frente frío desde el sur.";
-  }
-
-  if (
-    datos.direccionViento === "NE" &&
-    datos.humedad > 80
-  ) {
-
-    icono = "🌦";
-
-    mensaje =
-      "Ingreso de aire húmedo.";
-
-    detalle =
-      "Probables lluvias aisladas.";
-  }
-
-  if (
-    datos.direccionViento === "E" &&
-    datos.humedad > 85
-  ) {
-
-    icono = "🌫";
-
-    mensaje =
-      "Ambiente muy húmedo.";
-
-    detalle =
-      "Posible niebla o llovizna.";
-  }
-
-  if (
-    datos.presion > 1015 &&
-    datos.humedad < 70
-  ) {
-
-    icono = "☀️";
-
-    mensaje =
-      "Condiciones estables.";
-
-    detalle =
-      "Buen tiempo esperado.";
-  }
-
-  if (
-    datos.vientoKMH > 40
-  ) {
-
-    icono = "💨";
-
-    mensaje =
-      "Vientos fuertes.";
-
-    detalle =
-      "Posible cambio de masa de aire.";
-  }
-
-  document.getElementById(
-    "prediccion"
-  ).innerHTML = `
-
-    <h3>
-      ${icono}
-      Pronóstico meteorológico
-    </h3>
-
-    <p>
-      ${mensaje}
-    </p>
-
-    <p>
-      ${detalle}
-    </p>
-
-    <hr>
 
     📅 ${datos.fecha}<br>
 
@@ -322,14 +479,18 @@ function generarPronostico(historial) {
 
     🌡 ${datos.temperatura} °C<br>
 
+    💧 ${datos.humedad}%<br>
+
     💨 ${datos.vientoKMH} km/h<br>
 
     🧭 ${datos.direccionViento}<br>
 
-    💧 ${datos.humedad}%<br>
+    📉 ${datos.presion} hPa<br>
 
-    📉 ${datos.presion} hPa
+    🌧 ${datos.lluvia} mm
   `;
+
+  generarPronostico(historial);
 }
 
 function generarGrafica() {
@@ -366,20 +527,13 @@ function generarGrafica() {
       item => item.presion
     );
 
-  const lluvias =
-    historial.map(
-      item => item.lluvia
-    );
-
   const ctx =
     document
       .getElementById("grafica")
       .getContext("2d");
 
-  if (grafica) {
-
+  if (grafica)
     grafica.destroy();
-  }
 
   grafica =
     new Chart(ctx, {
@@ -413,12 +567,6 @@ function generarGrafica() {
           {
             label: "Presión hPa",
             data: presiones,
-            borderWidth: 2
-          },
-
-          {
-            label: "Lluvia mm",
-            data: lluvias,
             borderWidth: 2
           }
         ]
@@ -466,7 +614,7 @@ function mostrarHistorial() {
 
         <div class="registro">
 
-          📅 ${item.fecha} |
+          📅 ${item.fecha}
 
           🕒 ${item.hora}<br>
 
