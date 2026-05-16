@@ -17,7 +17,7 @@ body {
 
 .contenedor {
 
-  max-width: 1100px;
+  max-width: 1200px;
 
   margin: auto;
 
@@ -35,7 +35,7 @@ body {
 
   margin: 0;
 
-  font-size: 38px;
+  font-size: 40px;
 }
 
 .encabezado p {
@@ -43,6 +43,8 @@ body {
   color: #cbd5e1;
 
   margin-top: 10px;
+
+  font-size: 18px;
 }
 
 .grid {
@@ -82,6 +84,17 @@ h2 {
   margin-top: 0;
 
   color: #90e0ef;
+}
+
+.etiqueta {
+
+  display: block;
+
+  margin-top: 14px;
+
+  margin-bottom: 5px;
+
+  font-weight: bold;
 }
 
 input,
@@ -136,7 +149,7 @@ button:hover {
 #datosActuales,
 #prediccion {
 
-  line-height: 1.8;
+  line-height: 1.9;
 
   font-size: 17px;
 }
@@ -155,6 +168,21 @@ button:hover {
   line-height: 1.7;
 }
 
+.alertas {
+
+  background:
+    rgba(255,0,0,0.15);
+
+  border:
+    1px solid rgba(255,0,0,0.4);
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  margin-bottom: 20px;
+}
+
 canvas {
 
   margin-top: 20px;
@@ -164,6 +192,11 @@ canvas {
   border-radius: 12px;
 
   padding: 10px;
+}
+
+iframe {
+
+  border-radius: 12px;
 }
 
 @media (max-width: 768px) {
