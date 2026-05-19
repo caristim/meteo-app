@@ -13,17 +13,17 @@ import {
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyDgePXZtE_U0tVkmlMBS7X3qMTpqSnHg94",
+  apiKey: "AIzaSyCwDBudjX8-PPNwAZ9DX7YhXoOv1J4WbfI",
 
-  authDomain: "meteo-app-c36b3.firebaseapp.com",
+  authDomain: "meteo-barra.firebaseapp.com",
 
-  projectId: "meteo-app-c36b3",
+  projectId: "meteo-barra",
 
-  storageBucket: "meteo-app-c36b3.firebasestorage.app",
+  storageBucket: "meteo-barra.firebasestorage.app",
 
-  messagingSenderId: "96352586704",
+  messagingSenderId: "147460415233",
 
-  appId: "1:96352586704:web:cb8b3b4439c1a4230287d5"
+  appId: "1:147460415233:web:4301c0ac30259692c40500"
 };
 
 const app =
@@ -63,7 +63,7 @@ async function migrarDatosLocales() {
   }
 
   alert(
-    "✅ Datos locales migrados a Firebase correctamente"
+    "✅ Datos locales migrados correctamente"
   );
 }
 
@@ -245,7 +245,7 @@ function generarPronostico(historial) {
   ) {
 
     mensaje =
-      "🌧 Probabilidad alta de lluvias.";
+      "🌧 Alta probabilidad de lluvias.";
   }
 
   if (
