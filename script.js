@@ -1,4 +1,71 @@
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyDgePXZtE_U0tVkmlMBS7X3qMTpqSnHg94",
+
+  authDomain: "meteo-app-c36b3.firebaseapp.com",
+
+  projectId: "meteo-app-c36b3",
+
+  storageBucket: "meteo-app-c36b3.firebasestorage.app",
+
+  messagingSenderId: "96352586704",
+
+  appId: "1:96352586704:web:cb8b3b4439c1a4230287d5"
+};
+
+const app =
+  initializeApp(firebaseConfig);
+
+const db =
+  getFirestore(app);
+
 let grafica;
+
+async function migrarDatosLocales() {
+
+  const datosLocales =
+    JSON.parse(
+      localStorage.getItem(
+        "historialMeteorologico"
+      )
+    ) || [];
+
+  if (datosLocales.length === 0)
+    return;
+
+  const existentes =
+    await getDocs(
+      collection(db, "meteorologia")
+    );
+
+  if (!existentes.empty)
+    return;
+
+  for (const dato of datosLocales) {
+
+    await addDoc(
+      collection(db, "meteorologia"),
+      dato
+    );
+  }
+
+  alert(
+    "✅ Datos locales migrados a Firebase correctamente"
+  );
+}
 
 function obtenerFaseLunar() {
 
@@ -32,25 +99,36 @@ function obtenerFaseLunar() {
   return "🌘 Luna Menguante";
 }
 
-function guardarDatos() {
+window.guardarDatos =
+async function guardarDatos() {
 
   const temperatura =
-    parseFloat(document.getElementById("temperatura").value);
+    parseFloat(
+      document.getElementById("temperatura").value
+    );
 
   const humedad =
-    parseFloat(document.getElementById("humedad").value);
+    parseFloat(
+      document.getElementById("humedad").value
+    );
 
   const vientoMS =
-    parseFloat(document.getElementById("viento").value);
+    parseFloat(
+      document.getElementById("viento").value
+    );
 
   const direccionViento =
     document.getElementById("direccionViento").value;
 
   const presion =
-    parseFloat(document.getElementById("presion").value);
+    parseFloat(
+      document.getElementById("presion").value
+    );
 
   const lluvia =
-    parseFloat(document.getElementById("lluvia").value);
+    parseFloat(
+      document.getElementById("lluvia").value
+    );
 
   if (
     isNaN(temperatura) ||
@@ -66,32 +144,27 @@ function guardarDatos() {
   }
 
   const vientoKMH =
-    parseFloat((vientoMS * 3.6).toFixed(1));
+    parseFloat(
+      (vientoMS * 3.6).toFixed(1)
+    );
 
-  const ahora = new Date();
-
-  const fecha =
-    ahora.toLocaleDateString();
-
-  const hora =
-    ahora.toLocaleTimeString();
-
-  const faseLunar =
-    obtenerFaseLunar();
+  const ahora =
+    new Date();
 
   const nuevaMedicion = {
 
-    fecha,
+    fecha:
+      ahora.toLocaleDateString(),
 
-    hora,
+    hora:
+      ahora.toLocaleTimeString(),
 
-    faseLunar,
+    faseLunar:
+      obtenerFaseLunar(),
 
     temperatura,
 
     humedad,
-
-    vientoMS,
 
     vientoKMH,
 
@@ -101,31 +174,19 @@ function guardarDatos() {
 
     lluvia,
 
-    timestamp: Date.now()
+    timestamp:
+      Date.now()
   };
 
-  let historial =
-    JSON.parse(
-      localStorage.getItem(
-        "historialMeteorologico"
-      )
-    ) || [];
-
-  historial.push(nuevaMedicion);
-
-  localStorage.setItem(
-    "historialMeteorologico",
-    JSON.stringify(historial)
+  await addDoc(
+    collection(db, "meteorologia"),
+    nuevaMedicion
   );
 
-  mostrarDatos();
-
-  generarGrafica();
-
-  mostrarHistorial();
-
   limpiarCampos();
-}
+
+  cargarDatos();
+};
 
 function limpiarCampos() {
 
@@ -140,149 +201,34 @@ function limpiarCampos() {
   document.getElementById("lluvia").value = "";
 }
 
-function calcularTendencias(historial) {
+async function cargarDatos() {
 
-  if (historial.length < 3) {
-
-    return {
-
-      tendenciaPresion: "estable",
-
-      tendenciaTemp: "estable",
-
-      tendenciaHumedad: "estable"
-    };
-  }
-
-  const actual =
-    historial[historial.length - 1];
-
-  const anterior =
-    historial[historial.length - 3];
-
-  const deltaPresion =
-    actual.presion - anterior.presion;
-
-  const deltaTemp =
-    actual.temperatura - anterior.temperatura;
-
-  const deltaHumedad =
-    actual.humedad - anterior.humedad;
-
-  let tendenciaPresion = "estable";
-
-  let tendenciaTemp = "estable";
-
-  let tendenciaHumedad = "estable";
-
-  if (deltaPresion <= -4)
-    tendenciaPresion = "bajando fuerte";
-
-  else if (deltaPresion < 0)
-    tendenciaPresion = "bajando";
-
-  else if (deltaPresion >= 4)
-    tendenciaPresion = "subiendo fuerte";
-
-  else if (deltaPresion > 0)
-    tendenciaPresion = "subiendo";
-
-  if (deltaTemp > 2)
-    tendenciaTemp = "subiendo";
-
-  else if (deltaTemp < -2)
-    tendenciaTemp = "bajando";
-
-  if (deltaHumedad > 10)
-    tendenciaHumedad = "subiendo";
-
-  else if (deltaHumedad < -10)
-    tendenciaHumedad = "bajando";
-
-  return {
-
-    tendenciaPresion,
-
-    tendenciaTemp,
-
-    tendenciaHumedad
-  };
-}
-
-function generarAlertas(datos, tendencias) {
-
-  let alertas = [];
-
-  if (
-    datos.presion < 1005 &&
-    datos.humedad > 85 &&
-    tendencias.tendenciaPresion.includes("bajando")
-  ) {
-
-    alertas.push(
-      "🔴 Riesgo de lluvia o tormenta"
+  const q =
+    query(
+      collection(db, "meteorologia"),
+      orderBy("timestamp")
     );
-  }
 
-  if (datos.vientoKMH > 50) {
+  const querySnapshot =
+    await getDocs(q);
 
-    alertas.push(
-      "💨 Vientos fuertes"
-    );
-  }
+  const historial = [];
 
-  if (datos.temperatura > 34) {
+  querySnapshot.forEach(doc => {
 
-    alertas.push(
-      "🌡 Calor intenso"
-    );
-  }
+    historial.push(doc.data());
+  });
 
-  if (datos.temperatura < 5) {
+  if (historial.length === 0)
+    return;
 
-    alertas.push(
-      "❄ Frío intenso"
-    );
-  }
+  mostrarDatos(historial);
 
-  return alertas;
-}
+  generarGrafica(historial);
 
-function clasificarTiempo(datos, tendencias) {
+  mostrarHistorial(historial);
 
-  if (
-    datos.presion > 1015 &&
-    datos.humedad < 70
-  ) {
-
-    return "☀️ Tiempo estable";
-  }
-
-  if (
-    datos.presion < 1005 &&
-    datos.humedad > 85
-  ) {
-
-    return "🌧 Tiempo inestable";
-  }
-
-  if (
-    datos.direccionViento === "S" &&
-    tendencias.tendenciaTemp === "bajando"
-  ) {
-
-    return "🌬 Frente frío";
-  }
-
-  if (
-    datos.direccionViento === "NE" &&
-    datos.humedad > 80
-  ) {
-
-    return "🌦 Aire húmedo";
-  }
-
-  return "⛅ Tiempo variable";
+  generarPronostico(historial);
 }
 
 function generarPronostico(historial) {
@@ -290,125 +236,51 @@ function generarPronostico(historial) {
   const datos =
     historial[historial.length - 1];
 
-  const tendencias =
-    calcularTendencias(historial);
-
-  const clasificacion =
-    clasificarTiempo(datos, tendencias);
-
-  const alertas =
-    generarAlertas(datos, tendencias);
-
-  let pronostico12h =
-    "Sin cambios importantes.";
-
-  let pronostico24h =
-    "Tiempo relativamente estable.";
+  let mensaje =
+    "⛅ Tiempo relativamente estable.";
 
   if (
-    tendencias.tendenciaPresion.includes("bajando")
+    datos.presion < 1005 &&
+    datos.humedad > 85
   ) {
 
-    pronostico12h =
-      "Aumento de inestabilidad.";
-
-    pronostico24h =
-      "Mayor probabilidad de lluvias.";
+    mensaje =
+      "🌧 Probabilidad alta de lluvias.";
   }
 
   if (
-    tendencias.tendenciaPresion.includes("subiendo")
+    datos.vientoKMH > 45
   ) {
 
-    pronostico12h =
-      "Mejoría gradual.";
-
-    pronostico24h =
-      "Tiempo más estable.";
-  }
-
-  let htmlAlertas = "";
-
-  if (alertas.length > 0) {
-
-    htmlAlertas =
-      `
-      <div class="alertas">
-
-        <h3>⚠ Alertas meteorológicas</h3>
-
-        ${alertas.map(
-          a => `<p>${a}</p>`
-        ).join("")}
-
-      </div>
-      `;
+    mensaje +=
+      " 💨 Vientos fuertes.";
   }
 
   document.getElementById(
     "prediccion"
   ).innerHTML = `
 
-    ${htmlAlertas}
+    🌡 ${datos.temperatura} °C<br>
 
-    <h3>
-      🤖 IA meteorológica local
-    </h3>
-
-    <strong>
-      Clasificación automática:
-    </strong><br>
-
-    ${clasificacion}
-
-    <hr>
-
-    <strong>
-      Pronóstico 12 horas
-    </strong>
-
-    <p>
-      ${pronostico12h}
-    </p>
-
-    <strong>
-      Pronóstico 24 horas
-    </strong>
-
-    <p>
-      ${pronostico24h}
-    </p>
-
-    <hr>
-
-    📉 Presión:
-    ${tendencias.tendenciaPresion}<br>
-
-    🌡 Temperatura:
-    ${tendencias.tendenciaTemp}<br>
-
-    💧 Humedad:
-    ${tendencias.tendenciaHumedad}<br><br>
-
-    🌙 ${datos.faseLunar}<br>
+    💧 ${datos.humedad}%<br>
 
     💨 ${datos.vientoKMH} km/h<br>
 
-    🧭 ${datos.direccionViento}
+    🧭 ${datos.direccionViento}<br>
+
+    📉 ${datos.presion} hPa<br>
+
+    🌧 ${datos.lluvia} mm<br><br>
+
+    <strong>
+      Pronóstico:
+    </strong><br>
+
+    ${mensaje}
   `;
 }
 
-function mostrarDatos() {
-
-  const historial =
-    JSON.parse(
-      localStorage.getItem(
-        "historialMeteorologico"
-      )
-    ) || [];
-
-  if (historial.length === 0)
-    return;
+function mostrarDatos(historial) {
 
   const datos =
     historial[historial.length - 1];
@@ -435,18 +307,9 @@ function mostrarDatos() {
 
     🌧 ${datos.lluvia} mm
   `;
-
-  generarPronostico(historial);
 }
 
-function generarGrafica() {
-
-  const historial =
-    JSON.parse(
-      localStorage.getItem(
-        "historialMeteorologico"
-      )
-    ) || [];
+function generarGrafica(historial) {
 
   const etiquetas =
     historial.map(
@@ -471,11 +334,6 @@ function generarGrafica() {
   const presiones =
     historial.map(
       item => item.presion
-    );
-
-  const lluvias =
-    historial.map(
-      item => item.lluvia
     );
 
   const ctx =
@@ -519,38 +377,13 @@ function generarGrafica() {
             label: "Presión hPa",
             data: presiones,
             borderWidth: 2
-          },
-
-          {
-            label: "Lluvia mm",
-            data: lluvias,
-            borderWidth: 2
           }
         ]
-      },
-
-      options: {
-
-        responsive: true,
-
-        interaction: {
-
-          mode: "index",
-
-          intersect: false
-        }
       }
     });
 }
 
-function mostrarHistorial() {
-
-  const historial =
-    JSON.parse(
-      localStorage.getItem(
-        "historialMeteorologico"
-      )
-    ) || [];
+function mostrarHistorial(historial) {
 
   let html = "";
 
@@ -590,55 +423,6 @@ function mostrarHistorial() {
   ).innerHTML = html;
 }
 
-function exportarCSV() {
+await migrarDatosLocales();
 
-  const historial =
-    JSON.parse(
-      localStorage.getItem(
-        "historialMeteorologico"
-      )
-    ) || [];
-
-  if (historial.length === 0) {
-
-    alert(
-      "No hay datos para exportar"
-    );
-
-    return;
-  }
-
-  let csv =
-    "Fecha,Hora,FaseLunar,Temperatura,Humedad,VientoKMH,Direccion,Presion,Lluvia\n";
-
-  historial.forEach(item => {
-
-    csv +=
-      `${item.fecha},${item.hora},${item.faseLunar},${item.temperatura},${item.humedad},${item.vientoKMH},${item.direccionViento},${item.presion},${item.lluvia}\n`;
-  });
-
-  const blob =
-    new Blob(
-      [csv],
-      { type: "text/csv" }
-    );
-
-  const url =
-    window.URL.createObjectURL(blob);
-
-  const a =
-    document.createElement("a");
-
-  a.href = url;
-
-  a.download =
-    "datos_meteorologicos.csv";
-
-  a.click();
-}
-
-mostrarDatos();
-
-generarGrafica();
-
-mostrarHistorial();
+cargarDatos();
